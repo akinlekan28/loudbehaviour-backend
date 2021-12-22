@@ -8,6 +8,8 @@ const xss = require("xss-clean");
 const rateLimit = require("express-rate-limit");
 const hpp = require("hpp");
 const cors = require("cors");
+const passport = require("passport");
+const session = require("express-session");
 const errorHandler = require("./middleware/error");
 const winston = require("winston");
 const expressWinston = require("express-winston");
@@ -63,6 +65,17 @@ app.use(hpp());
 
 // Enable CORS
 app.use(cors());
+
+app.use(
+  session({
+    secret: process.env.SECRET,
+    resave: false,
+    saveUninitialized: true,
+  })
+);
+// Passport middleware
+app.use(passport.initialize());
+app.use(passport.session());
 
 // Set static folder
 app.use(express.static(path.join(__dirname, "public")));
