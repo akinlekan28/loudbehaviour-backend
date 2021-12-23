@@ -13,13 +13,14 @@ const session = require("express-session");
 const errorHandler = require("./middleware/error");
 const winston = require("winston");
 const expressWinston = require("express-winston");
-const connectDB = require("./config/db");
-
-// Load env vars
 dotenv.config({ path: "./config/config.env" });
+const connectDB = require("./config/db");
 
 // Connect to database
 connectDB();
+
+//Load passport config
+require("./utils/passport")(passport);
 
 //Route files
 const auth = require("./routes/auth");
