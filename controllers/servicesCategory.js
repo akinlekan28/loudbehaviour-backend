@@ -40,6 +40,21 @@ exports.createServiceCategory = asyncHandler(async (req, res, next) => {
   }
 });
 
+// @desc      GET service category
+// @route     GET /api/v1/servicecategory
+// @access    Private
+exports.getServiceCategories = asyncHandler(async (req, res, next) => {
+  const servicesCategories = await ServiceCategory.find({})
+    .where("is_delete")
+    .equals(0);
+
+  return res.status(200).json({
+    success: true,
+    count: servicesCategories.length,
+    data: servicesCategories,
+  });
+});
+
 // @desc      Update service category
 // @route     PUT /api/v1/servicecategory/:id
 // @access    Private
@@ -78,4 +93,33 @@ exports.updateServiceCategory = asyncHandler(async (req, res, next) => {
   );
 
   res.status(200).json({ success: true, data: serviceCategoryItem });
+});
+
+// @desc      Delete service category
+// @route     POST /api/v1/servicecategory/:id
+// @access    Private
+exports.deleteServiceCategory = asyncHandler(async (req, res, next) => {
+  let serviceCategoryItem = await ServiceCategory.findById(req.params.id);
+
+  if (!serviceCategoryItem) {
+    return next(new ErrorResponse(`Service category not found`, 404));
+  }
+  if (req.user.role !== "admin") {
+    return next(
+      new ErrorResponse(`User is not authorized to delete this service`, 401)
+    );
+  }
+
+  serviceCategoryItem = await ServiceCategory.findByIdAndUpdate(
+    req.params.id,
+    { is_delete: 1 },
+    {
+      new: true,
+      runValidators: true,
+    }
+  );
+
+  res
+    .status(200)
+    .json({ success: true, data: "Service category has been deleted" });
 });
