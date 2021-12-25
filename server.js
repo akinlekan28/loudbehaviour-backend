@@ -24,6 +24,7 @@ require("./utils/passport")(passport);
 
 //Route files
 const auth = require("./routes/auth");
+const services = require("./routes/services");
 
 const app = express();
 
@@ -100,6 +101,7 @@ app.use(
 
 // Mount routers
 app.use("/api/v1/auth", auth);
+app.use("/api/v1/services", services);
 
 app.use(errorHandler);
 
