@@ -10,6 +10,7 @@ const hpp = require("hpp");
 const cors = require("cors");
 const passport = require("passport");
 const session = require("express-session");
+const fileupload = require("express-fileupload");
 const errorHandler = require("./middleware/error");
 const winston = require("winston");
 const expressWinston = require("express-winston");
@@ -25,6 +26,7 @@ require("./utils/passport")(passport);
 //Route files
 const auth = require("./routes/auth");
 const services = require("./routes/services");
+const servicesCategory = require("./routes/servicesCategory");
 
 const app = express();
 
@@ -44,6 +46,14 @@ app.use(
 
 // Cookie parser
 app.use(cookieParser());
+
+// File uploading
+app.use(
+  fileupload({
+    useTempFiles: true,
+    tempFileDir: "/tmp/",
+  })
+);
 
 // Sanitize data
 app.use(mongoSanitize());
@@ -82,26 +92,27 @@ app.use(passport.session());
 app.use(express.static(path.join(__dirname, "public")));
 
 //Wiston request logger
-app.use(
-  expressWinston.logger({
-    transports: [new winston.transports.Console()],
-    format: winston.format.combine(
-      winston.format.colorize(),
-      winston.format.json()
-    ),
-    meta: true, // optional: control whether you want to log the meta data about the request (default to true)
-    msg: "HTTP {{req.method}} {{req.url}}", // optional: customize the default logging message. E.g. "{{res.statusCode}} {{req.method}} {{res.responseTime}}ms {{req.url}}"
-    expressFormat: true, // Use the default Express/morgan request formatting. Enabling this will override any msg if true. Will only output colors with colorize set to true
-    colorize: false, // Color the text and status code, using the Express/morgan color palette (text: gray, status: default green, 3XX cyan, 4XX yellow, 5XX red).
-    ignoreRoute: function (req, res) {
-      return false;
-    }, // optional: allows to skip some log messages based on request and/or response
-  })
-);
+// app.use(
+//   expressWinston.logger({
+//     transports: [new winston.transports.Console()],
+//     format: winston.format.combine(
+//       winston.format.colorize(),
+//       winston.format.json()
+//     ),
+//     meta: true, // optional: control whether you want to log the meta data about the request (default to true)
+//     msg: "HTTP {{req.method}} {{req.url}}", // optional: customize the default logging message. E.g. "{{res.statusCode}} {{req.method}} {{res.responseTime}}ms {{req.url}}"
+//     expressFormat: true, // Use the default Express/morgan request formatting. Enabling this will override any msg if true. Will only output colors with colorize set to true
+//     colorize: false, // Color the text and status code, using the Express/morgan color palette (text: gray, status: default green, 3XX cyan, 4XX yellow, 5XX red).
+//     ignoreRoute: function (req, res) {
+//       return false;
+//     }, // optional: allows to skip some log messages based on request and/or response
+//   })
+// );
 
 // Mount routers
 app.use("/api/v1/auth", auth);
 app.use("/api/v1/services", services);
+app.use("/api/v1/servicescategory", servicesCategory);
 
 app.use(errorHandler);
 
@@ -114,7 +125,5 @@ const server = app.listen(
 
 // Handle unhandled promise rejections
 process.on("unhandledRejection", (err, promise) => {
-  console.log(`Error: ${err.message}`.red);
-  // Close server & exit process
-  // server.close(() => process.exit(1));
+  console.log(`Error: ${err.message}`);
 });
