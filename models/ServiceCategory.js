@@ -13,6 +13,9 @@ const ServiceCategorySchema = new mongoose.Schema({
     type: String,
     required: [true, "A valid image url must be supplied"],
   },
+  imagePublicId: {
+    type: String,
+  },
   slug: {
     type: String,
   },
