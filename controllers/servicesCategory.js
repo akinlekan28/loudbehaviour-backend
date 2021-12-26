@@ -55,6 +55,21 @@ exports.getServiceCategories = asyncHandler(async (req, res, next) => {
   });
 });
 
+// @desc      GET archived service category
+// @route     GET /api/v1/servicecategory/archive
+// @access    Private
+exports.getArchiveServiceCategories = asyncHandler(async (req, res, next) => {
+  const servicesCategories = await ServiceCategory.find({})
+    .where("is_delete")
+    .equals(1);
+
+  return res.status(200).json({
+    success: true,
+    count: servicesCategories.length,
+    data: servicesCategories,
+  });
+});
+
 // @desc      Update service category
 // @route     PUT /api/v1/servicecategory/:id
 // @access    Private

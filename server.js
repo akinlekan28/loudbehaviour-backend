@@ -27,6 +27,7 @@ require("./utils/passport")(passport);
 const auth = require("./routes/auth");
 const services = require("./routes/services");
 const servicesCategory = require("./routes/servicesCategory");
+const product = require("./routes/product");
 
 const app = express();
 
@@ -113,6 +114,7 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use("/api/v1/auth", auth);
 app.use("/api/v1/services", services);
 app.use("/api/v1/servicescategory", servicesCategory);
+app.use("/api/v1/product", product);
 
 app.use(errorHandler);
 

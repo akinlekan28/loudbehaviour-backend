@@ -4,6 +4,7 @@ const {
   updateServiceCategory,
   deleteServiceCategory,
   getServiceCategories,
+  getArchiveServiceCategories,
 } = require("../controllers/servicesCategory");
 const router = express.Router();
 
@@ -17,5 +18,12 @@ router
   .route("/:id")
   .put(protect, authorize("admin"), updateServiceCategory)
   .post(protect, authorize("admin"), deleteServiceCategory);
+
+router.get(
+  "/archive",
+  protect,
+  authorize("admin", "publisher"),
+  getArchiveServiceCategories
+);
 
 module.exports = router;
