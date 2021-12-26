@@ -6,6 +6,7 @@ const {
   forgotpassword,
   resetPassword,
   profile,
+  getUsers,
 } = require("../controllers/auth");
 
 const router = express.Router();
@@ -14,6 +15,7 @@ const { protect } = require("../middleware/auth");
 router.post("/register", register);
 router.post("/login", login);
 router.get("/profile", protect, profile);
+router.get("/users", protect, getUsers);
 router.post("/forgotpassword", forgotpassword);
 router.put("/resetpassword/:resettoken", resetPassword);
 router.get(

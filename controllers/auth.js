@@ -62,6 +62,19 @@ exports.profile = asyncHandler(async (req, res, next) => {
   });
 });
 
+// @desc      Get all users
+// @route     GET /api/v1/auth/users
+// @access    Private
+exports.getUsers = asyncHandler(async (req, res, next) => {
+  const users = await User.find({});
+
+  return res.status(200).json({
+    success: true,
+    count: users.length,
+    data: users,
+  });
+});
+
 // @desc      Forgot password
 // @route     POST /api/v1/auth/forgotpassword
 // @access    Public
