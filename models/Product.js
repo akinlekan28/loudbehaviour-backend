@@ -10,8 +10,9 @@ const ProductSchema = new mongoose.Schema({
     required: [true, "Please add a price"],
   },
   serviceCategoryId: {
-    type: String,
-    required: [true, "Service category is required"],
+    type: mongoose.Schema.ObjectId,
+    ref: "ServiceCategory",
+    required: true,
   },
   image: {
     type: String,

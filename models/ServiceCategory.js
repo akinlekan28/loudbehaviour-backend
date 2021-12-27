@@ -6,8 +6,9 @@ const ServiceCategorySchema = new mongoose.Schema({
     required: [true, "Please add a name"],
   },
   serviceId: {
-    type: String,
-    required: [true, "Service category cannot be empty"],
+    type: mongoose.Schema.ObjectId,
+    ref: "Service",
+    required: true,
   },
   image: {
     type: String,
