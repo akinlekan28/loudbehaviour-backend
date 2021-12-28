@@ -29,6 +29,7 @@ const services = require("./routes/services");
 const servicesCategory = require("./routes/servicesCategory");
 const product = require("./routes/product");
 const notification = require("./routes/notification");
+const coupon = require("./routes/coupon");
 
 const app = express();
 
@@ -117,6 +118,7 @@ app.use("/api/v1/services", services);
 app.use("/api/v1/servicescategory", servicesCategory);
 app.use("/api/v1/product", product);
 app.use("/api/v1/notification", notification);
+app.use("/api/v1/coupon", coupon);
 
 app.use(errorHandler);
 

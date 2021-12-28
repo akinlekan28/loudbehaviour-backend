@@ -1,7 +1,6 @@
 const ErrorResponse = require("../utils/errorResponse");
 const asyncHandler = require("../middleware/async");
 const Notification = require("../models/Notification");
-const paginationWithQuery = require("../middleware/paginationWithQuery");
 
 // @desc      Add notification
 // @route     POST /api/v1/notification

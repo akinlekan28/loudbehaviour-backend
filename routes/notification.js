@@ -4,6 +4,7 @@ const {
   createNotification,
   getNotifications,
   readAllNotifications,
+  readNotification,
 } = require("../controllers/notification");
 const Notification = require("../models/Notification");
 const router = express.Router();
@@ -32,5 +33,7 @@ router.get(
   }),
   getUserNotifications
 );
+
+router.put("/:id", protect, readNotification);
 
 module.exports = router;

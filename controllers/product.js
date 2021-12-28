@@ -79,7 +79,9 @@ exports.updateProduct = asyncHandler(async (req, res, next) => {
     req.body.imagePublicId = imageDetails.public_id;
   }
 
-  req.body.slug = slugify(req.body.name);
+  if (req.body.name) {
+    req.body.slug = slugify(req.body.name);
+  }
   req.body.updatedAt = Date.now();
 
   productItem = await Product.findByIdAndUpdate(req.params.id, req.body, {
