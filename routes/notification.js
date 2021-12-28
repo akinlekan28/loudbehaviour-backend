@@ -10,6 +10,7 @@ const router = express.Router();
 
 const { protect, authorize } = require("../middleware/auth");
 const advancedResults = require("../middleware/advancedResults");
+const paginationWithQuery = require("../middleware/paginationWithQuery");
 
 router
   .route("/")
@@ -21,6 +22,15 @@ router
   )
   .post(createNotification)
   .put(protect, readAllNotifications);
-router.get("/user", protect, getUserNotifications);
+router.get(
+  "/user",
+  protect,
+  paginationWithQuery(Notification, {
+    type: "find",
+    conditions: "user",
+    sort: true,
+  }),
+  getUserNotifications
+);
 
 module.exports = router;

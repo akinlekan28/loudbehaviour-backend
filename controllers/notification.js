@@ -1,6 +1,7 @@
 const ErrorResponse = require("../utils/errorResponse");
 const asyncHandler = require("../middleware/async");
 const Notification = require("../models/Notification");
+const paginationWithQuery = require("../middleware/paginationWithQuery");
 
 // @desc      Add notification
 // @route     POST /api/v1/notification
@@ -55,45 +56,7 @@ exports.readAllNotifications = asyncHandler(async (req, res, next) => {
 // @route     GET /api/v1/notification/user
 // @access    Private
 exports.getUserNotifications = asyncHandler(async (req, res, next) => {
-  req.body.user = req.user.id;
-  const page = parseInt(req.query.page);
-  const limit = parseInt(req.query.limit);
-  const startIndex = (page - 1) * limit;
-  const endIndex = page * limit;
-  const total = await Notification.countDocuments()
-    .where("user")
-    .equals(req.body.user);
-
-  const notifications = await Notification.find()
-    .where("user")
-    .equals(req.body.user)
-    .sort({ createdAt: -1 })
-    .skip(startIndex)
-    .limit(limit)
-    .exec();
-
-  const pagination = {};
-
-  if (endIndex < total) {
-    pagination.next = {
-      page: page + 1,
-      limit,
-    };
-  }
-
-  if (startIndex > 0) {
-    pagination.prev = {
-      page: page - 1,
-      limit,
-    };
-  }
-
-  res.status(200).json({
-    status: true,
-    count: notifications.length,
-    pagination,
-    data: notifications,
-  });
+  res.status(200).json(res.paginationWithQuery);
 });
 
 // @desc      Get all notification
