@@ -4,6 +4,7 @@ const {
   updateCoupon,
   getCoupons,
   deleteCoupon,
+  getCoupon,
 } = require("../controllers/coupon");
 const router = express.Router();
 
@@ -15,6 +16,7 @@ router
   .post(protect, authorize("admin"), createCoupon);
 router
   .route("/:id")
+  .get(getCoupon)
   .put(protect, authorize("admin"), updateCoupon)
   .post(protect, authorize("admin"), deleteCoupon);
 

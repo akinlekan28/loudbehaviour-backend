@@ -33,6 +33,21 @@ exports.getCoupons = asyncHandler(async (req, res, next) => {
   });
 });
 
+// @desc      Get coupon
+// @route     GET /api/v1/coupon/:id
+// @access    Public
+exports.getCoupon = asyncHandler(async (req, res, next) => {
+  let coupon = await Coupon.findById(req.params.id);
+
+  if (!coupon) {
+    return next(
+      new ErrorResponse(`Coupon not found with id of ${req.params.id}`, 404)
+    );
+  }
+
+  res.status(200).json({ success: true, data: coupon });
+});
+
 // @desc      Update coupon
 // @route     PUT /api/v1/coupon/:id
 // @access    Private
