@@ -9,6 +9,14 @@ const paginationWithQuery =
       query = model.find().where("user").equals(req.user.id);
       total = await model.countDocuments().where("user").equals(req.user.id);
     }
+    if (customQuery.conditions && customQuery.conditions == "deleted") {
+      query = model.find().where("is_delete").equals(1);
+      total = await model.countDocuments().where("is_delete").equals(1);
+    }
+    if (customQuery.conditions && customQuery.conditions == "non_deleted") {
+      query = model.find().where("is_delete").equals(0);
+      total = await model.countDocuments().where("is_delete").equals(0);
+    }
     if (customQuery.sort) {
       query = query.sort({ createdAt: -1 });
     }

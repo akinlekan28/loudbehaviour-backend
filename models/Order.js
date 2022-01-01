@@ -44,6 +44,10 @@ const OrderSchema = new mongoose.Schema({
     enum: ["Success", "Failed", "Pending"],
     default: "Pending",
   },
+  is_delete: {
+    type: Number,
+    default: 0,
+  },
   updatedAt: {
     type: Date,
     default: Date.now,

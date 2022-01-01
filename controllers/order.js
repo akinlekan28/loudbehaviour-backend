@@ -58,7 +58,14 @@ exports.getOrder = asyncHandler(async (req, res, next) => {
 // @route     GET /api/v1/order
 // @access    Private
 exports.getOrders = asyncHandler(async (req, res, next) => {
-  res.status(200).json(res.advancedResults);
+  res.status(200).json(res.paginationWithQuery);
+});
+
+// @desc      Get orders
+// @route     GET /api/v1/order/archive
+// @access    Private
+exports.getArchiveOrders = asyncHandler(async (req, res, next) => {
+  res.status(200).json(res.paginationWithQuery);
 });
 
 // @desc      Get user orders
@@ -67,3 +74,32 @@ exports.getOrders = asyncHandler(async (req, res, next) => {
 exports.getUserOrders = asyncHandler(async (req, res, next) => {
   res.status(200).json(res.paginationWithQuery);
 });
+
+// @desc      Archive order
+// @route     POST /api/v1/order/id:
+// @access    Private
+exports.deleteOrder = asyncHandler(async (req, res, next) => {
+  let order = await Order.findById(req.params.id);
+
+  if (!order) {
+    return next(new ErrorResponse(`Order not found`, 404));
+  }
+  if (req.user.role !== "admin") {
+    return next(
+      new ErrorResponse(`User is not authorized to delete this service`, 401)
+    );
+  }
+
+  order = await Order.findByIdAndUpdate(
+    req.params.id,
+    { is_delete: 1 },
+    {
+      new: true,
+      runValidators: true,
+    }
+  );
+
+  res.status(200).json({ success: true, data: "Order has been deleted" });
+});
+
+//TODO: payment webhook
