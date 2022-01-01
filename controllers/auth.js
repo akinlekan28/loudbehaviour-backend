@@ -3,6 +3,10 @@ const ErrorResponse = require("../utils/errorResponse");
 const asyncHandler = require("../middleware/async");
 const User = require("../models/User");
 const sendEmail = require("../utils/sendEmail");
+const {
+  uploadToCloudinary,
+  deleteFromCloudinary,
+} = require("../utils/cloudinary");
 
 // @desc      Register user
 // @route     POST /api/v1/auth/register
@@ -60,6 +64,38 @@ exports.profile = asyncHandler(async (req, res, next) => {
     success: true,
     data: user,
   });
+});
+
+// @desc      Update user profile
+// @route     PUT /api/v1/auth/profile/:id
+// @access    Private
+exports.updateProfile = asyncHandler(async (req, res, next) => {
+  let userProfile = await User.findById(req.params.id);
+
+  if (!userProfile) {
+    return next(new ErrorResponse(`User profile not found`, 404));
+  }
+
+  if (req.files) {
+    imageDetails = await uploadToCloudinary(req.files.image.tempFilePath);
+    if (userProfile.imagePublicId) {
+      await deleteFromCloudinary(userProfile.imagePublicId);
+    }
+  }
+
+  if (imageDetails && imageDetails.public_id) {
+    req.body.image = imageDetails.secure_url;
+    req.body.imagePublicId = imageDetails.public_id;
+  }
+
+  req.body.updatedAt = Date.now();
+
+  userProfile = await User.findByIdAndUpdate(req.params.id, req.body, {
+    new: true,
+    runValidators: true,
+  });
+
+  res.status(200).json({ success: true, data: userProfile });
 });
 
 // @desc      Get all users

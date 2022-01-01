@@ -21,6 +21,18 @@ const UserSchema = new mongoose.Schema({
       "Please add a valid email",
     ],
   },
+  birthday: {
+    type: Date,
+  },
+  image: {
+    type: String,
+  },
+  imagePublicId: {
+    type: String,
+  },
+  phone: {
+    type: String,
+  },
   role: {
     type: String,
     enum: ["user", "publisher", "admin"],
@@ -36,6 +48,10 @@ const UserSchema = new mongoose.Schema({
   },
   resetPasswordToken: String,
   resetPasswordExpire: Date,
+  updatedAt: {
+    type: Date,
+    default: Date.now,
+  },
   createdAt: {
     type: Date,
     default: Date.now,

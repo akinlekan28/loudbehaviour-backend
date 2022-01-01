@@ -7,6 +7,7 @@ const {
   resetPassword,
   profile,
   getUsers,
+  updateProfile,
 } = require("../controllers/auth");
 
 const router = express.Router();
@@ -18,6 +19,7 @@ router.get("/profile", protect, profile);
 router.get("/users", protect, getUsers);
 router.post("/forgotpassword", forgotpassword);
 router.put("/resetpassword/:resettoken", resetPassword);
+router.put("/profile/:id", updateProfile);
 router.get(
   "/google",
   passport.authenticate("google", { scope: ["profile", "email"] })
