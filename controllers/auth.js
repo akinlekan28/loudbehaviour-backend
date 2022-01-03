@@ -7,6 +7,7 @@ const {
   uploadToCloudinary,
   deleteFromCloudinary,
 } = require("../utils/cloudinary");
+const forgotPassword = require("../utils/emails/forgotPassword");
 
 // @desc      Register user
 // @route     POST /api/v1/auth/register
@@ -127,17 +128,22 @@ exports.forgotpassword = asyncHandler(async (req, res, next) => {
   await user.save({ validateBeforeSave: false });
 
   // Create reset url
-  const resetUrl = `${req.protocol}://${req.get(
+  const link = `${req.protocol}://${req.get(
     "host"
   )}/api/v1/auth/resetpassword/${resetToken}`;
 
-  const message = `You are receiving this email because you (or someone else) has requested the reset of a password. Please make a PUT request to: \n\n ${resetUrl}`;
+  // const message = `You are receiving this email because you (or someone else) has requested the reset of a password. Please make a PUT request to: \n\n ${resetUrl}`;
 
   try {
+    const html = forgotPassword({
+      name: user.firstName,
+      link,
+    });
+
     await sendEmail({
       email: user.email,
-      subject: "Password reset token",
-      message,
+      subject: "Password reset",
+      html,
     });
 
     res.status(200).json({ success: true, data: "Reset email has been sent!" });
