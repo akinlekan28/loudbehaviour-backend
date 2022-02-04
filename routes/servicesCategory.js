@@ -5,6 +5,7 @@ const {
   deleteServiceCategory,
   getServiceCategories,
   getArchiveServiceCategories,
+  getServiceCategoryBySlug,
 } = require("../controllers/servicesCategory");
 const router = express.Router();
 
@@ -25,5 +26,7 @@ router.get(
   authorize("admin", "publisher"),
   getArchiveServiceCategories
 );
+
+router.get("/all/:slug", getServiceCategoryBySlug);
 
 module.exports = router;

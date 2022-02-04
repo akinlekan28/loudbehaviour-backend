@@ -6,6 +6,7 @@ const {
   uploadToCloudinary,
   deleteFromCloudinary,
 } = require("../utils/cloudinary");
+const Service = require("../models/Service");
 
 // @desc      Add service category
 // @route     POST /api/v1/servicecategory
@@ -55,11 +56,31 @@ exports.getServiceCategories = asyncHandler(async (req, res, next) => {
   });
 });
 
-
 // @desc      GET service category by slug
-// @route     GET /api/v1/servicecategory/:slug
+// @route     GET /api/v1/servicecategory/all/:slug
 // @access    Private
+exports.getServiceCategoryBySlug = asyncHandler(async (req, res, next) => {
+  let service = await Service.findOne({ slug: req.params.slug });
 
+  if (service._id) {
+    let serviceCategories = await ServiceCategory.find({
+      serviceId: service._id,
+    })
+      .populate("serviceId", "name", Service)
+      .where("is_delete")
+      .equals(0);
+
+    return res.status(200).json({
+      success: true,
+      count: serviceCategories.length,
+      data: serviceCategories,
+    });
+  } else {
+    return res
+      .status(404)
+      .json({ success: false, message: "Categories could not be fetched" });
+  }
+});
 
 // @desc      GET archived service category
 // @route     GET /api/v1/servicecategory/archive
