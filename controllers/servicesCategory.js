@@ -55,6 +55,12 @@ exports.getServiceCategories = asyncHandler(async (req, res, next) => {
   });
 });
 
+
+// @desc      GET service category by slug
+// @route     GET /api/v1/servicecategory/:slug
+// @access    Private
+
+
 // @desc      GET archived service category
 // @route     GET /api/v1/servicecategory/archive
 // @access    Private

@@ -2,6 +2,10 @@ const ErrorResponse = require("../utils/errorResponse");
 const asyncHandler = require("../middleware/async");
 const Service = require("../models/Service");
 const slugify = require("../utils/slugify");
+const {
+  uploadToCloudinary,
+  deleteFromCloudinary,
+} = require("../utils/cloudinary");
 
 // @desc      Add service
 // @route     POST /api/v1/service
@@ -15,14 +19,27 @@ exports.createService = asyncHandler(async (req, res, next) => {
     );
   }
 
-  req.body.slug = slugify(req.body.name);
+  if (!req.files) {
+    return next(new ErrorResponse(`Image needs to be uploaded`, 400));
+  }
 
-  const service = await Service.create(req.body);
+  const imageDetails = await uploadToCloudinary(req.files.image.tempFilePath);
 
-  res.status(201).json({
-    success: true,
-    data: service,
-  });
+  if (imageDetails.public_id) {
+    req.body.image = imageDetails.secure_url;
+    req.body.imagePublicId = imageDetails.public_id;
+    req.body.slug = slugify(req.body.name);
+    const service = await Service.create(req.body);
+
+    res.status(201).json({
+      success: true,
+      data: service,
+    });
+  } else {
+    return next(
+      new ErrorResponse(`Something went wrong trying to upload the image`, 400)
+    );
+  }
 });
 
 // @desc      Get services
@@ -43,6 +60,7 @@ exports.getServices = asyncHandler(async (req, res, next) => {
 // @access    Private
 exports.updateService = asyncHandler(async (req, res, next) => {
   let serviceItem = await Service.findById(req.params.id);
+  let imageDetails;
 
   if (!serviceItem) {
     return next(new ErrorResponse(`Service not found`, 404));
@@ -52,8 +70,19 @@ exports.updateService = asyncHandler(async (req, res, next) => {
       new ErrorResponse(`User is not authorized to update this service`, 401)
     );
   }
+  if (req.files) {
+    imageDetails = await uploadToCloudinary(req.files.image.tempFilePath);
+    await deleteFromCloudinary(serviceItem.imagePublicId);
+  }
 
-  req.body.slug = slugify(req.body.name);
+  if (imageDetails && imageDetails.public_id) {
+    req.body.image = imageDetails.secure_url;
+    req.body.imagePublicId = imageDetails.public_id;
+  }
+
+  if (req.body.name) {
+    req.body.slug = slugify(req.body.name);
+  }
 
   serviceItem = await Service.findByIdAndUpdate(req.params.id, req.body, {
     new: true,

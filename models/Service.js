@@ -8,9 +8,24 @@ const ServiceSchema = new mongoose.Schema({
   slug: {
     type: String,
   },
+  image: {
+    type: String,
+    required: [true, "A valid image url must be supplied"],
+  },
+  imagePublicId: {
+    type: String,
+  },
+  description: {
+    type: String,
+    required: [true, "Please add a description"],
+  },
   is_delete: {
     type: Number,
     default: 0,
+  },
+  has_products: {
+    type: Boolean,
+    default: true,
   },
   createdAt: {
     type: Date,

@@ -22,6 +22,7 @@ const ServiceCategorySchema = new mongoose.Schema({
   },
   description: {
     type: String,
+    required: [true, "Please add a description"],
   },
   is_delete: {
     type: Number,
