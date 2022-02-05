@@ -6,7 +6,9 @@ const {
   getServiceCategories,
   getArchiveServiceCategories,
   getServiceCategoryBySlug,
+  getPaginatedServiceCategoryBySlug,
 } = require("../controllers/servicesCategory");
+const advancedResults = require("../middleware/advancedResults");
 const router = express.Router();
 
 const { protect, authorize } = require("../middleware/auth");
@@ -14,7 +16,7 @@ const { protect, authorize } = require("../middleware/auth");
 router
   .route("/")
   .post(protect, authorize("admin"), createServiceCategory)
-  .get(protect, authorize("admin", "publisher"), getServiceCategories);
+  .get(getServiceCategories);
 router
   .route("/:id")
   .put(protect, authorize("admin"), updateServiceCategory)
@@ -28,5 +30,6 @@ router.get(
 );
 
 router.get("/all/:slug", getServiceCategoryBySlug);
+router.get("/paginated/:slug", getPaginatedServiceCategoryBySlug);
 
 module.exports = router;

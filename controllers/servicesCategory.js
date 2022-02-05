@@ -58,11 +58,11 @@ exports.getServiceCategories = asyncHandler(async (req, res, next) => {
 
 // @desc      GET service category by slug
 // @route     GET /api/v1/servicecategory/all/:slug
-// @access    Private
+// @access    Public
 exports.getServiceCategoryBySlug = asyncHandler(async (req, res, next) => {
   let service = await Service.findOne({ slug: req.params.slug });
 
-  if (service._id) {
+  if (service && service._id) {
     let serviceCategories = await ServiceCategory.find({
       serviceId: service._id,
     })
@@ -81,6 +81,60 @@ exports.getServiceCategoryBySlug = asyncHandler(async (req, res, next) => {
       .json({ success: false, message: "Categories could not be fetched" });
   }
 });
+
+// @desc      GET paginated service category by slug
+// @route     GET /api/v1/servicecategory/paginated/:slug
+// @access    Public
+exports.getPaginatedServiceCategoryBySlug = asyncHandler(
+  async (req, res, next) => {
+    let service = await Service.findOne({ slug: req.params.slug });
+    total = await ServiceCategory.countDocuments()
+      .where("is_delete")
+      .equals(0)
+      .where("slug")
+      .equals(req.params.slug);
+    const page = parseInt(req.query.page);
+    const limit = parseInt(req.query.limit);
+    const startIndex = (page - 1) * limit;
+    const endIndex = page * limit;
+
+    if (service && service._id) {
+      let serviceCategories = await ServiceCategory.find({
+        serviceId: service._id,
+      })
+        .skip(startIndex)
+        .limit(limit)
+        .where("is_delete")
+        .equals(0);
+
+      const pagination = {};
+
+      if (endIndex < total) {
+        pagination.next = {
+          page: page + 1,
+          limit,
+        };
+      }
+      if (startIndex > 0) {
+        pagination.prev = {
+          page: page - 1,
+          limit,
+        };
+      }
+
+      return res.status(200).json({
+        success: true,
+        count: serviceCategories.length,
+        pagination,
+        data: serviceCategories,
+      });
+    } else {
+      return res
+        .status(404)
+        .json({ success: false, message: "Categories could not be fetched" });
+    }
+  }
+);
 
 // @desc      GET archived service category
 // @route     GET /api/v1/servicecategory/archive
