@@ -13,17 +13,26 @@ const Service = require("../models/Service");
 // @access    Private
 exports.createServiceCategory = asyncHandler(async (req, res, next) => {
   req.body.user = req.user.id;
+  let logoDetails;
   if (req.user.role !== "admin") {
     return next(
       new ErrorResponse(`User is not authorized to add a service`, 401)
     );
   }
 
-  if (!req.files) {
+  if (!req.files.image) {
     return next(new ErrorResponse(`Image needs to be uploaded`, 400));
   }
 
   const imageDetails = await uploadToCloudinary(req.files.image.tempFilePath);
+  if (req.files.logo) {
+    logoDetails = await uploadToCloudinary(req.files.logo.tempFilePath);
+
+    if (logoDetails.public_id) {
+      req.body.logo = logoDetails.secure_url;
+      req.body.logoPublicId = logoDetails.public_id;
+    }
+  }
 
   if (imageDetails.public_id) {
     req.body.image = imageDetails.secure_url;
@@ -157,6 +166,7 @@ exports.getArchiveServiceCategories = asyncHandler(async (req, res, next) => {
 exports.updateServiceCategory = asyncHandler(async (req, res, next) => {
   let serviceCategoryItem = await ServiceCategory.findById(req.params.id);
   let imageDetails;
+  let logoDetails;
 
   if (!serviceCategoryItem) {
     return next(new ErrorResponse(`Service not found`, 404));
@@ -167,9 +177,19 @@ exports.updateServiceCategory = asyncHandler(async (req, res, next) => {
     );
   }
 
-  if (req.files) {
+  if (req.files.image) {
     imageDetails = await uploadToCloudinary(req.files.image.tempFilePath);
     await deleteFromCloudinary(serviceCategoryItem.imagePublicId);
+  }
+
+  if (req.files.logo) {
+    logoDetails = await uploadToCloudinary(req.files.logo.tempFilePath);
+    await deleteFromCloudinary(serviceCategoryItem.logoPublicId);
+  }
+
+  if (logoDetails && logoDetails.public_id) {
+    req.body.logo = logoDetails.secure_url;
+    req.body.logoPublicId = logoDetails.public_id;
   }
 
   if (imageDetails && imageDetails.public_id) {

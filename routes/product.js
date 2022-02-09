@@ -5,6 +5,7 @@ const {
   updateProduct,
   deleteProduct,
   getArchiveProducts,
+  getProductsBySlug,
 } = require("../controllers/product");
 const router = express.Router();
 
@@ -25,5 +26,7 @@ router.get(
   authorize("admin", "publisher"),
   getArchiveProducts
 );
+
+router.get("/all/:slug", getProductsBySlug);
 
 module.exports = router;

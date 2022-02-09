@@ -6,6 +6,7 @@ const {
   uploadToCloudinary,
   deleteFromCloudinary,
 } = require("../utils/cloudinary");
+const ServiceCategory = require("../models/ServiceCategory");
 
 // @desc      Add product
 // @route     POST /api/v1/product
@@ -42,7 +43,7 @@ exports.createProduct = asyncHandler(async (req, res, next) => {
 
 // @desc      GET product
 // @route     GET /api/v1/product
-// @access    Private
+// @access    Public
 exports.getProducts = asyncHandler(async (req, res, next) => {
   const products = await Product.find({}).where("is_delete").equals(0);
 
@@ -51,6 +52,35 @@ exports.getProducts = asyncHandler(async (req, res, next) => {
     count: products.length,
     data: products,
   });
+});
+
+// @desc      GET product
+// @route     GET /api/v1/product/all/:slug
+// @access    Public
+exports.getProductsBySlug = asyncHandler(async (req, res, next) => {
+  let serviceCategory = await ServiceCategory.findOne({
+    slug: req.params.slug,
+  });
+
+  if (serviceCategory && serviceCategory._id) {
+    let products = await Product.find({
+      serviceCategoryId: serviceCategory._id,
+    })
+      .populate("serviceCategoryId", "name description", serviceCategory)
+      .where("is_delete")
+      .equals(0);
+
+    return res.status(200).json({
+      success: true,
+      count: products.length,
+      serviceCategory,
+      data: products,
+    });
+  } else {
+    return res
+      .status(404)
+      .json({ success: false, message: "Products could not be fetched" });
+  }
 });
 
 // @desc      Edit product

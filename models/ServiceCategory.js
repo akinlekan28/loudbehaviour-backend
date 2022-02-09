@@ -17,6 +17,12 @@ const ServiceCategorySchema = new mongoose.Schema({
   imagePublicId: {
     type: String,
   },
+  logo: {
+    type: String,
+  },
+  logoPublicId: {
+    type: String,
+  },
   slug: {
     type: String,
   },
