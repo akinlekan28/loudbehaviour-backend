@@ -61,6 +61,7 @@ exports.getProductsBySlug = asyncHandler(async (req, res, next) => {
   let serviceCategory = await ServiceCategory.findOne({
     slug: req.params.slug,
   });
+  const data = [];
 
   if (serviceCategory && serviceCategory._id) {
     let products = await Product.find({
@@ -70,11 +71,15 @@ exports.getProductsBySlug = asyncHandler(async (req, res, next) => {
       .where("is_delete")
       .equals(0);
 
+    products.map((product) => {
+      data.push({ product, label: product.name, value: product._id });
+    });
+
     return res.status(200).json({
       success: true,
       count: products.length,
       serviceCategory,
-      data: products,
+      data,
     });
   } else {
     return res

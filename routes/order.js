@@ -19,7 +19,7 @@ router
   .post(createOrder)
   .get(
     protect,
-    authorize("admin", "publisher"),
+    authorize("admin", "publisher", "user"),
     paginationWithQuery(
       Order,
       {

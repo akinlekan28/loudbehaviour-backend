@@ -13,12 +13,13 @@ const forgotPassword = require("../utils/emails/forgotPassword");
 // @route     POST /api/v1/auth/register
 // @access    Public
 exports.register = asyncHandler(async (req, res, next) => {
-  const { firstName, lastName, email, password, role } = req.body;
+  const { firstName, lastName, phone, email, password, role } = req.body;
 
   // Create user
   const user = await User.create({
     firstName,
     lastName,
+    phone,
     email,
     password,
     role,
@@ -128,9 +129,7 @@ exports.forgotpassword = asyncHandler(async (req, res, next) => {
   await user.save({ validateBeforeSave: false });
 
   // Create reset url
-  const link = `${req.protocol}://${req.get(
-    "host"
-  )}/api/v1/auth/resetpassword/${resetToken}`;
+  const link = `${process.env.CLIENT_URL}/reset/${resetToken}`;
 
   // const message = `You are receiving this email because you (or someone else) has requested the reset of a password. Please make a PUT request to: \n\n ${resetUrl}`;
 
