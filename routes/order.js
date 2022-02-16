@@ -42,7 +42,7 @@ router
   .post(protect, authorize("admin"), deleteOrder);
 
 router.get(
-  "/user",
+  "/user/history",
   protect,
   paginationWithQuery(
     Order,
@@ -53,7 +53,7 @@ router.get(
     },
     {
       path: "product",
-      select: "name deliveryDays",
+      select: "name deliveryDays image description logo",
     }
   ),
   getUserOrders
