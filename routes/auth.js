@@ -7,7 +7,7 @@ const {
   resetPassword,
   profile,
   getUsers,
-  updateProfile,
+  updateProfile, getStatistics
 } = require("../controllers/auth");
 
 const router = express.Router();
@@ -18,6 +18,7 @@ router.post("/login", login);
 router.get("/profile", protect, profile);
 router.get("/users", protect, getUsers);
 router.post("/forgotpassword", forgotpassword);
+router.get("/serviceanalytics", protect, getStatistics);
 router.put("/resetpassword/:resettoken", resetPassword);
 router.put("/profile/:id", updateProfile);
 router.get(

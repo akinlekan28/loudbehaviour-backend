@@ -1,6 +1,8 @@
 const ErrorResponse = require("../utils/errorResponse");
 const asyncHandler = require("../middleware/async");
 const Notification = require("../models/Notification");
+const sendEmail = require("../utils/sendEmail");
+const contactPage = require("../utils/emails/contactPage");
 
 // @desc      Add notification
 // @route     POST /api/v1/notification
@@ -12,6 +14,23 @@ exports.createNotification = asyncHandler(async (req, res, next) => {
     success: true,
     data: notification,
   });
+});
+
+// @desc      Add notification
+// @route     POST /api/v1/notification/sendmessage
+// @access    Public
+exports.sendMessage = asyncHandler(async (req, res, next) => {
+  console.log(req.body);
+
+  const html = contactPage(req.body);
+
+  await sendEmail({
+    email: "loudbehaviour@gmail.com",
+    subject: "Contact Page inquiry",
+    html,
+  });
+
+  res.status(200).json({ success: true, data: "Message has been sent!" });
 });
 
 // @desc      Read notification

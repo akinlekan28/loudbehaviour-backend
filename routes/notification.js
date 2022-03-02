@@ -5,6 +5,7 @@ const {
   getNotifications,
   readAllNotifications,
   readNotification,
+  sendMessage,
 } = require("../controllers/notification");
 const Notification = require("../models/Notification");
 const router = express.Router();
@@ -33,6 +34,7 @@ router.get(
   }),
   getUserNotifications
 );
+router.post("/sendmessage", sendMessage);
 
 router.put("/:id", protect, readNotification);
 

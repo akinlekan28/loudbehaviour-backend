@@ -8,6 +8,8 @@ const {
   deleteFromCloudinary,
 } = require("../utils/cloudinary");
 const forgotPassword = require("../utils/emails/forgotPassword");
+const Order = require('../models/Order')
+const Notification = require('../models/Notification')
 
 // @desc      Register user
 // @route     POST /api/v1/auth/register
@@ -68,11 +70,38 @@ exports.profile = asyncHandler(async (req, res, next) => {
   });
 });
 
+// @desc      Get statistics of logged in user
+// @route     GET /api/v1/auth/serviceanalytics
+// @access    Private
+exports.getStatistics = asyncHandler(async (req, res, next) => {
+  const subscriptions = await Order.find({}).where('user').equals(req.user.id);
+  const notifications = await Notification.countDocuments().where('user').equals(req.user.id);
+
+  const activeSubscription = [];
+  const awaitingApproval = [];
+  const expired = [];
+
+  subscriptions.forEach(item => {
+    if(item.status == 'Completed'){
+      expired.push(item)
+    }
+    if(item.status == 'In Progress'){
+      activeSubscription.push(item)
+    }
+    if(item.status == 'Pending'){
+      awaitingApproval.push(item)
+    }
+  })
+
+  return res.status(200).json({activeSubscription: activeSubscription.length, awaitingApproval: awaitingApproval.length, expired: expired.length,  notifications})
+}) 
+
 // @desc      Update user profile
 // @route     PUT /api/v1/auth/profile/:id
 // @access    Private
 exports.updateProfile = asyncHandler(async (req, res, next) => {
   let userProfile = await User.findById(req.params.id);
+  let imageDetails;
 
   if (!userProfile) {
     return next(new ErrorResponse(`User profile not found`, 404));
