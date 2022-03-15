@@ -7,6 +7,7 @@ const {
   getOrder,
   deleteOrder,
   getArchiveOrders,
+  verifyPaystackPayment,
 } = require("../controllers/order");
 const router = express.Router();
 
@@ -77,5 +78,7 @@ router.get(
   ),
   getArchiveOrders
 );
+
+router.post("/payment/verify/:reference", verifyPaystackPayment);
 
 module.exports = router;

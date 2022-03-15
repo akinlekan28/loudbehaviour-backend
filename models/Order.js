@@ -1,10 +1,6 @@
 const mongoose = require("mongoose");
 
 const OrderSchema = new mongoose.Schema({
-  sku: {
-    type: String,
-    required: true,
-  },
   product: {
     type: mongoose.Schema.ObjectId,
     ref: "Product",

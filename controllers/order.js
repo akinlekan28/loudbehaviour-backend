@@ -1,16 +1,48 @@
 const ErrorResponse = require("../utils/errorResponse");
 const asyncHandler = require("../middleware/async");
 const Order = require("../models/Order");
+const axios = require("axios");
 // const Product = require("../models/Product");
 // const Coupon = require("../models/Coupon");
+
+// @desc      Verify payment
+// @route     POST /api/v1/order/payment/verify
+// @access    Public
+exports.verifyPaystackPayment = asyncHandler(async (req, res, next) => {
+  const reference = req.params.reference;
+
+  const verified = await Order.find({ paymentReference: reference });
+  if (verified) {
+    return res.status(200);
+  } else {
+    axios
+      .get(`api.paystack.co/transaction/verify/${reference}`)
+      .then((res) => {
+        if (res.data && res.data.data.status == "success") {
+          const { metadata, amount, reference } = res.data.data;
+          const payload = {
+            product: metadata.product._id,
+            user: metadata._id,
+            amountPaid: amount / 100,
+            link: metadata.productLink,
+            paymentChannel: "Paystack",
+            paymentReference: reference,
+            paymentStatus: "Completed",
+          };
+
+          this.createOrder(payload);
+        }
+      })
+      .catch((err) => {
+        return res.status(400).json({ err });
+      });
+  }
+});
 
 // @desc      Add order
 // @route     POST /api/v1/order
 // @access    Private
 exports.createOrder = asyncHandler(async (req, res, next) => {
-  let sku = Math.random().toString(36).slice(2).toUpperCase();
-  req.body.sku = "LB" + sku;
-
   const order = await Order.create(req.body);
 
   res.status(201).json({
