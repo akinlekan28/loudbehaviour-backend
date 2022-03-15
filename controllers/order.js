@@ -20,8 +20,9 @@ exports.verifyPaystackPayment = asyncHandler(async (req, res, next) => {
         `api.paystack.co/transaction/verify/${reference}`,
         {},
         {
-          Authorization:
-            "Bearer sk_test_2f9e791a4663e34557592363f446876d4350f376",
+          headers: {
+            Authorization: `Bearer ${process.env.PAYSTACK_SECRET}`,
+          },
         }
       )
       .then((res) => {
