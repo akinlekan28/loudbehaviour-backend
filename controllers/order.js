@@ -16,7 +16,14 @@ exports.verifyPaystackPayment = asyncHandler(async (req, res, next) => {
     return res.status(200);
   } else {
     axios
-      .get(`api.paystack.co/transaction/verify/${reference}`)
+      .get(
+        `api.paystack.co/transaction/verify/${reference}`,
+        {},
+        {
+          Authorization:
+            "Bearer sk_test_2f9e791a4663e34557592363f446876d4350f376",
+        }
+      )
       .then((res) => {
         if (res.data && res.data.data.status == "success") {
           const { metadata, amount, reference } = res.data.data;
