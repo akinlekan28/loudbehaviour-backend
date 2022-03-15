@@ -1,6 +1,10 @@
 const path = require("path");
 const express = require("express");
 const dotenv = require("dotenv");
+dotenv.config({
+  path:
+    process.env.NODE_ENV == "development" ? "./config/config.env" : "./.env",
+});
 const cookieParser = require("cookie-parser");
 const mongoSanitize = require("express-mongo-sanitize");
 const helmet = require("helmet");
@@ -14,7 +18,6 @@ const fileupload = require("express-fileupload");
 const errorHandler = require("./middleware/error");
 const winston = require("winston");
 const expressWinston = require("express-winston");
-dotenv.config({ path: "./config/config.env" });
 const connectDB = require("./config/db");
 
 // Connect to database
