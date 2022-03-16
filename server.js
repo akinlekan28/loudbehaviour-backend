@@ -84,6 +84,11 @@ app.use(hpp());
 // Enable CORS
 app.use(cors());
 
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  next();
+});
+
 app.use(
   session({
     secret: process.env.SECRET,

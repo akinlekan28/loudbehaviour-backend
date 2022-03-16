@@ -12,22 +12,22 @@ exports.verifyPaystackPayment = asyncHandler(async (req, res, next) => {
   const reference = req.params.reference;
 
   const verified = await Order.find({ paymentReference: reference });
-  if (verified) {
-    return res.status(200);
+  console.log(verified.length)
+  if (verified.length > 0) {
+    return res.status(200).json({success: true});
   } else {
     axios
       .get(
-        `api.paystack.co/transaction/verify/${reference}`,
-        {},
+        `https://api.paystack.co/transaction/verify/${reference}`,
         {
           headers: {
             Authorization: `Bearer ${process.env.PAYSTACK_SECRET}`,
           },
         }
       )
-      .then((res) => {
-        if (res.data && res.data.data.status == "success") {
-          const { metadata, amount, reference } = res.data.data;
+      .then(async (response) => {
+        if (response.data && response.data.data.status == "success") {
+          const { metadata, amount, reference } = response.data.data;
           const payload = {
             product: metadata.product._id,
             user: metadata._id,
@@ -35,16 +35,22 @@ exports.verifyPaystackPayment = asyncHandler(async (req, res, next) => {
             link: metadata.productLink,
             paymentChannel: "Paystack",
             paymentReference: reference,
-            paymentStatus: "Completed",
+            paymentStatus: "Success",
           };
 
-          this.createOrder(payload);
+            const order = await Order.create(payload);
+
+            res.status(201).json({
+              success: true,
+              data: order,
+            });
         }
       })
       .catch((err) => {
         return res.status(400).json({ err });
       });
   }
+  
 });
 
 // @desc      Add order
