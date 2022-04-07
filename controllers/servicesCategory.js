@@ -177,12 +177,12 @@ exports.updateServiceCategory = asyncHandler(async (req, res, next) => {
     );
   }
 
-  if (req.files.image) {
+  if (req.files && req.files.image) {
     imageDetails = await uploadToCloudinary(req.files.image.tempFilePath);
     await deleteFromCloudinary(serviceCategoryItem.imagePublicId);
   }
 
-  if (req.files.logo) {
+  if (req.files && req.files.logo) {
     logoDetails = await uploadToCloudinary(req.files.logo.tempFilePath);
     await deleteFromCloudinary(serviceCategoryItem.logoPublicId);
   }

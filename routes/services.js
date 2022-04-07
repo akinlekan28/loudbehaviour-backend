@@ -4,6 +4,7 @@ const {
   updateService,
   getServices,
   deleteService,
+  getArchivedServices,
 } = require("../controllers/services");
 const router = express.Router();
 
@@ -15,6 +16,7 @@ router
   .post(protect, authorize("admin"), createService);
 router
   .route("/:id")
+  .get(protect, authorize("admin"), getArchivedServices)
   .put(protect, authorize("admin"), updateService)
   .post(protect, authorize("admin"), deleteService);
 

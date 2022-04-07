@@ -1,9 +1,12 @@
 const path = require("path");
 const express = require("express");
 const dotenv = require("dotenv");
+// dotenv.config({
+//   path:
+//     process.env.NODE_ENV == "development" ? "./config/config.env" : "./.env",
+// });
 dotenv.config({
-  path:
-    process.env.NODE_ENV == "development" ? "./config/config.env" : "./.env",
+  path: "./config/config.env",
 });
 const cookieParser = require("cookie-parser");
 const mongoSanitize = require("express-mongo-sanitize");

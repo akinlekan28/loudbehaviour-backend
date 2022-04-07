@@ -55,6 +55,19 @@ exports.getServices = asyncHandler(async (req, res, next) => {
   });
 });
 
+// @desc      Get services
+// @route     GET /api/v1/service/:type
+// @access    Private
+exports.getArchivedServices = asyncHandler(async (req, res, next) => {
+  const services = await Service.find({}).where("is_delete").equals(1);
+
+  return res.status(200).json({
+    success: true,
+    count: services.length,
+    data: services,
+  });
+});
+
 // @desc      Update service
 // @route     PUT /api/v1/service/:id
 // @access    Private

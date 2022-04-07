@@ -88,6 +88,35 @@ exports.getProductsBySlug = asyncHandler(async (req, res, next) => {
   }
 });
 
+// @desc      GET product
+// @route     GET /api/v1/product/archived/:slug
+// @access    Public
+exports.getArchivedProductsBySlug = asyncHandler(async (req, res, next) => {
+  let serviceCategory = await ServiceCategory.findOne({
+    slug: req.params.slug,
+  });
+
+  if (serviceCategory && serviceCategory._id) {
+    let products = await Product.find({
+      serviceCategoryId: serviceCategory._id,
+    })
+      .populate("serviceCategoryId", "name description", serviceCategory)
+      .where("is_delete")
+      .equals(1);
+
+    return res.status(200).json({
+      success: true,
+      count: products.length,
+      serviceCategory,
+      data: products,
+    });
+  } else {
+    return res
+      .status(404)
+      .json({ success: false, message: "Products could not be fetched" });
+  }
+});
+
 // @desc      Edit product
 // @route     PUT /api/v1/product/:id
 // @access    Private

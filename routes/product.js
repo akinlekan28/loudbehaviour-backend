@@ -6,6 +6,7 @@ const {
   deleteProduct,
   getArchiveProducts,
   getProductsBySlug,
+  getArchivedProductsBySlug,
 } = require("../controllers/product");
 const router = express.Router();
 
@@ -28,5 +29,6 @@ router.get(
 );
 
 router.get("/all/:slug", getProductsBySlug);
+router.get("/archive/:slug", getArchivedProductsBySlug);
 
 module.exports = router;
