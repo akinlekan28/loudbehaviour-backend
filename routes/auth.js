@@ -1,5 +1,5 @@
-const express = require("express");
-const passport = require("passport");
+const express = require('express');
+const passport = require('passport');
 const {
   register,
   login,
@@ -7,43 +7,77 @@ const {
   resetPassword,
   profile,
   getUsers,
-  updateProfile, getStatistics
-} = require("../controllers/auth");
+  updateProfile,
+  getStatistics,
+  getAllUsers,
+  getArchivedUsers,
+  getAdminUsers,
+} = require('../controllers/auth');
 
 const router = express.Router();
-const { protect } = require("../middleware/auth");
+const { protect, authorize } = require('../middleware/auth');
+const advancedResults = require('../middleware/advancedResults');
+const paginationWithQuery = require('../middleware/paginationWithQuery');
+const User = require('../models/User');
 
-router.post("/register", register);
-router.post("/login", login);
-router.get("/profile", protect, profile);
-router.get("/users", protect, getUsers);
-router.post("/forgotpassword", forgotpassword);
-router.get("/serviceanalytics", protect, getStatistics);
-router.put("/resetpassword/:resettoken", resetPassword);
-router.put("/profile/:id", updateProfile);
+router.post('/register', register);
+router.post('/login', login);
+router.get('/profile', protect, profile);
+router.get('/users', protect, getUsers);
 router.get(
-  "/google",
-  passport.authenticate("google", { scope: ["profile", "email"] })
+  '/users/all',
+  protect,
+  authorize('admin', 'publisher'),
+  advancedResults(User),
+  getAllUsers
 );
 router.get(
-  "/google/callback",
-  passport.authenticate("google", { failureRedirect: "/" }),
+  '/users/archived',
+  protect,
+  authorize('admin', 'publisher'),
+  paginationWithQuery(User, {
+    type: 'find',
+    conditions: 'deleted',
+  }),
+  getArchivedUsers
+);
+router.get(
+  '/users/admin',
+  protect,
+  authorize('admin', 'publisher'),
+  paginationWithQuery(User, {
+    type: 'find',
+    conditions: 'admin',
+  }),
+  getAdminUsers
+);
+router.post('/forgotpassword', forgotpassword);
+router.get('/serviceanalytics', protect, getStatistics);
+router.put('/resetpassword/:resettoken', resetPassword);
+router.put('/profile/:id', updateProfile);
+router.get(
+  '/google',
+  passport.authenticate('google', { scope: ['profile', 'email'] })
+);
+router.get(
+  '/google/callback',
+  passport.authenticate('google', { failureRedirect: '/' }),
   (req, res) => {
     req.session.userId = req.user._id;
     res.redirect(`${process.env.CLIENT_URL}/dashboard`);
   }
 );
 router.get(
-  "/facebook",
-  passport.authenticate("facebook", {
-    scope: ["public_profile", "email"],
+  '/facebook',
+  passport.authenticate('facebook', {
+    scope: ['public_profile', 'email'],
   })
 );
 router.get(
-  "/facebook/callback",
-  passport.authenticate("facebook", {
-    successRedirect: "/dashboard",
-    failureRedirect: "/",
+  '/facebook/callback',
+  passport.authenticate('facebook', {
+    successRedirect: '/dashboard',
+    failureRedirect: '/',
   })
 );
 
